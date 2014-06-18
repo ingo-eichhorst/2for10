@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en"> <!-- manifest="cacheManifest.manifest" -->
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>2 for 10</title>
+		<meta name="description" content="">
+		<meta name="author" content="ingo-_000">
+		
+		<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+
+		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+		<link rel="shortcut icon" href="/favicon.ico">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<link rel="apple-touch-startup-image" href="startupimagename.png" >
+		
+		<link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+		
+		<script type="text/javascript" language="JavaScript">
+
+/**
+ * @author ingo-_000
+ */
+
+			/* Variable for storing how many fields are marked */
+			var marked = 0;
+			
+			/* Definition of vatriables needed to check if both can be deleted*/
+			var boxPosXPrev;
+			var boxPosYPrev;
+			var boxValuePrev;
+			
+			var matrix;
+			
+			var moves;
+
+			var currentLevel;
+			
+			function resetStore() {
+				localStorage.clear();
+				mainScreen();
+			}
+			
+			function mainScreen(){
+				contentArea = document.getElementById("startContent");
+				var i = 1;
+				contentArea.innerHTML = ""; // clear current display
+				while(levelScore != "no" && i < 21) { 
+					var levelScore = localStorage.getItem("Level" + i);
+					if (levelScore == null) {
+						levelScore = "no";
+					}
+					console.log(levelScore);
+					contentArea.innerHTML += '<div class="startLvlIcon" style="background-image: url(img/'+i+'.png);"> </div> <input type="button" name="lvl'+i+'" value="Level '+i+' (Highscore: ' + levelScore + ')" onclick="init(' + i + ')"> </br>' ;
+					i++;
+				}  			
+			}
+			
+			function init(lvl){
+				
+/*delete screen*/
+				document.getElementById("startPage").style.display = "none";
+				document.getElementById("gamePage").style.display = "block";
+				document.getElementById("gameFooter").style.display = "block";
+
+				currentLevel = lvl;
+
+				var startPosX = 0;
+				var startPosY = 0;
+
+
+/* create moves display*/
+				moves = 0;
+				document.getElementById("gameFooterButtonLeft").innerHTML = moves;
+
+				
+/************************
+ * Matrix erstellen
+ ************************/ 
+	
+				if (lvl == 1){			
+/* Test matrix */
+					matrix = [[1,1,9,1,1,9,1,1,1],
+							  [1,9,1,1,1,1,1,9,1],
+							  [9,1,9,1,1,1,9,1,9]];
+				}
+
+				if (lvl == 2){
+					matrix = [[1,2,4,6,8,6,4,2,1],
+							  [8,6,4,2,1,2,4,6,8],
+							  [1,2,4,6,8,6,4,2,1]];
+				}
+
+				if (lvl == 3){
+					matrix = [[2,4,6,8,9,8,6,4,2],
+							  [1,3,5,7,8,7,5,3,1],
+							  [2,4,6,8,9,8,6,4,2]];
+				}
+
+				if (lvl == 4){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+				if (lvl == 5){
+					matrix = [[10,-2,-3,11,12,13,0,12,10],
+							  [-1,0,12,-3,-2,-1,11,-2,13],
+							  [10,-1,-2,-3,12,13,11,-3,-2]];
+				}
+
+				if (lvl == 6){
+					matrix = [[1,2,3,1,2,3,1,2,3],
+							  [7,8,9,7,8,9,7,8,9],
+							  [3,2,1,3,2,1,3,2,1]];
+				}
+
+				if (lvl == 7){
+					matrix = [[9,6,2,8,4,1,7,3,1],
+							  [2,8,4,1,7,3,9,6,2],
+							  [3,1,7,3,9,6,2,8,4]];
+				}
+
+				if (lvl == 8){
+					matrix = [[-10,100,-30,20,-50,40,20,60,-10],
+							  [-10,-10,20,-30,-90,20,20,20,-50],
+							  [-50,60,20,-50,20,40,20,-30,-90]];
+				}
+
+				if (lvl == 9){
+					matrix = [[1,2,3,4,1,6,7,8,9],
+							  [9,1,8,9,7,7,6,1,1],
+							  [3,4,1,2,9,1,7,1,3]];
+				}
+/* lvl 10 - 19 = not defined yet */
+				if (lvl == 10){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+				if (lvl == 11){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+				if (lvl == 12){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+				if (lvl == 13){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+				if (lvl == 14){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+				if (lvl == 15){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+				if (lvl == 16){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+				if (lvl == 17){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+				if (lvl == 18){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+				if (lvl == 19){
+					matrix = [[2,3,2,4,2,5,2,6,2],
+							  [7,2,8,2,9,2,8,2,7],
+							  [2,6,2,5,2,4,2,3,2]];
+				}
+
+
+				if (lvl == 20){			
+/* final matrix */			
+					matrix = [[1,2,3,4,5,6,7,8,9],
+							  [1,1,1,2,1,3,1,4,1],
+							  [5,1,6,1,7,1,8,1,9]];
+				}
+
+				/* creation of table */
+				document.getElementById("gameContent").innerHTML = '<table id="gridBoard" rules="all" width="100%"> </table>';
+				/* creation of matrix */
+				for (i = 0; i < matrix.length; i++) {
+					var currentRow = document.getElementById("gridBoard").insertRow(i);
+					
+					  	for (j = 0; j < matrix[i].length; j++){
+						    if ((i+j)%2==0){
+							    var bgCol = "#5B827C";
+							}
+							else {
+						var bgCol = "#A3C2A2";
+							}
+	
+							var currentCell = currentRow.insertCell(j);
+							currentCell.setAttribute("width", "10%");
+							currentCell.style.backgroundColor = bgCol;
+							currentCell.innerHTML = '<div class="gameStone" id="' + i + "-" + j + '" onclick="markRed(' + i  + ", " + j + ')">' + matrix[i][j] + '</div>';
+				  	}
+				}
+
+/* initialize marked boxes */
+				var marked = 0;
+			}
+
+			function goFromTo(oldPage,newPage) {
+				mainScreen();
+			  	document.getElementById(oldPage).style.display = "none";
+			  	document.getElementById(newPage).style.display = "block";
+			  	document.getElementById("gameContentHighscore").style.display = "none";
+			}
+
+			function setHighscore(currentLevel, moves) {
+				localStorage.setItem("Level" + currentLevel, moves);
+				lvlScore = localStorage.getItem("Level" + currentLevel, moves);
+				console.log(lvlScore);
+			}
+
+			function getHighscore(currentLevel) {
+				return localStorage.getItem("Level" + currentLevel);
+			}
+			
+			function addMove(){
+				moves++;
+				document.getElementById("gameFooterButtonLeft").innerHTML = moves;
+			}
+
+			function setDesign(state, x, y){				
+				var currentBox = document.getElementById(x + "-" + y);
+				if (state == "toSelect") {
+					currentBox.style.backgroundColor = "#D17659";
+					currentBox.style.textShadow = "1px 1px 0px #777"; 				
+				}
+				else {
+						currentBox.style.backgroundColor = "#F7F6C9";
+						currentBox.style.textShadow = "1px 1px 0px #aade7c"; 
+				}
+			}
+			
+			function doubleFill(){
+				console.log('doubleFill:');
+				addMove();
+				
+				var fillArray = [];
+/* Create array */
+				var fill = 0;
+				
+				gridBoard = document.getElementById("gridBoard");
+				for (i = 0; i < gridBoard.rows.length; i++) {
+				  	for (j = 0; j < 9; j++){
+
+						if	(document.getElementById(i + "-" + j)) {					
+							if (document.getElementById(i + "-" + j).style.display != "none"){
+				  				fillArray[fill] = document.getElementById(i + "-" + j).innerHTML;
+				  				fill++;
+				  				var lastX = j;
+				  				var lastY = i;
+				  			}
+				  		}
+				  	}
+				}
+
+/* Calculate starting point for adding values */
+				var startPointX = lastX+1;
+				var startPointY = lastY;
+
+/* variable for count posission in Array*/
+				var df = 0;
+				
+/* Current row fill till the end*/
+
+				var currentPointY = startPointY;
+				var currentPointX = startPointX;
+				
+				while(fillArray[df]){
+
+/* Fill last current row */
+					if (startPointY == currentPointY && currentPointX <= 8) {
+						console.log("Fill last row cell: " + currentPointY + "-" + currentPointX + " with " + fillArray[df]);
+						currentCell = document.getElementById(currentPointY + "-" + currentPointX);
+						currentCell.style.display = "block";
+					 	currentCell.innerHTML = fillArray[df];
+						currentPointX++;
+						df++;
+					}
+
+/* Fill new row */
+					else if (startPointY < currentPointY && currentPointX <= 8){						
+						console.log("Fill new row cell: " + currentPointY + "-" + currentPointX);
+						if ((currentPointY+currentPointX)%2 == 0){
+							    var bgCol = "#5B827C";
+							}
+							else {
+								var bgCol = "#A3C2A2";
+							}
+						var currentCell = currentRow.insertCell(currentPointX);
+						currentCell.style.backgroundColor = bgCol;
+				 		currentCell.innerHTML = '<div class="gameStone" id="' + currentPointY + "-" + currentPointX + '" onclick="markRed(' + currentPointY  + ", " + currentPointX + ')">' + fillArray[df] + '</div>';
+				  		df++;
+						currentPointX++;
+					}
+	
+/* Open a new row */
+					else {			
+						currentPointX = 0;
+						currentPointY++;
+						var currentRow = document.getElementById("gridBoard").insertRow(currentPointY);
+					}
+				}
+				
+/* Fill the last line with emty cells if not filled completely */
+				for (var i=currentPointX; i <= 8; i++) {
+					if ((currentPointY+currentPointX)%2 == 0){
+						    var bgCol = "#5B827C";
+						}
+						else {
+							var bgCol = "#A3C2A2";
+						}
+					var currentCell = currentRow.insertCell(currentPointX);
+					currentCell.style.backgroundColor = bgCol;
+			 		currentCell.innerHTML = '<div class="gameStone" id="' + currentPointY + "-" + currentPointX + '" onclick="markRed(' + currentPointY  + ", " + currentPointX + ')">' + 1 + '</div>';
+					document.getElementById(currentPointY + "-" + currentPointX).style.display = "none";
+					currentPointX++;
+				}			
+			}
+			
+			function markRed(boxPosX, boxPosY){
+				console.log("X = " + boxPosX + "; " + "Y = " + boxPosY);
+				console.log("XPrev = " + boxPosXPrev + "; " + "YPrev = " + boxPosYPrev);
+				boxValue = document.getElementById(boxPosX + "-" + boxPosY).innerHTML;
+								
+				if (marked > 0) {
+					addMove();
+					if (document.getElementById(boxPosX + "-" + boxPosY).style.color == "#D17659") {
+
+/* box color when un-selected */
+						setDesign("toUnselect", boxPosX, boxPosY);
+						marked = 0;						
+					}
+					else {
+						var boxValueSum = Number(boxValue) + Number(boxValuePrev);
+						//console.log(boxValue + '+' + boxValuePrev + '=' + boxValueSum);
+
+/**********************************************
+ * First check: 
+ * Is first selected box plus second selected box eaqual 10
+ * and
+ * is the first selection a veretially or horizonal neighbor
+ **********************************************/
+						
+/* Check if the second selection is a horizontal or vertical neighboor */
+						
+/*	Requirement of a different behaviour for - eaqual 10 - cases was taken out (by Toby)					
+						if (boxValueSum == 10) {
+							if (boxPosY == boxPosYPrev){	
+								if (boxPosX == boxPosXPrev-1 || boxPosX == boxPosXPrev+1){
+									document.getElementById(boxPosX + "-" + boxPosY).style.display = "none";
+									document.getElementById(boxPosX + "-" + boxPosY).innerHTML = "X";
+									document.getElementById(boxPosXPrev + "-" + boxPosYPrev).style.display = "none";
+								}
+							}
+							if (boxPosX == boxPosXPrev){	
+								if (boxPosY == boxPosYPrev-1 || boxPosY == boxPosYPrev+1){
+									document.getElementById(boxPosX + "-" + boxPosY).style.display = "none";
+									document.getElementById(boxPosX + "-" + boxPosY).innerHTML = "X";
+									document.getElementById(boxPosXPrev + "-" + boxPosYPrev).style.display = "none";
+								}
+							}
+
+						}
+*/
+/**********************************************
+ * Second check: 
+ * Is first selected box eaqual to the second selected box
+ * and
+ * is no filled box between the first and the second selected box
+ **********************************************/
+
+						if (boxValue == boxValuePrev || boxValueSum == 10){
+/* check: are the fields left of the second box until the first box empty	*/	
+							if (boxPosX == boxPosXPrev && boxPosY > boxPosYPrev){
+								var filledBoxes = 0;
+								for (i=boxPosYPrev;i<boxPosY;i++){
+									
+									if (document.getElementById(boxPosX + "-" + i).style.display != "none"){
+										filledBoxes++;
+									}
+								}
+							
+								if (filledBoxes == 1) {
+									document.getElementById(boxPosX + "-" + boxPosY).style.display = "none";
+									document.getElementById(boxPosXPrev + "-" + boxPosYPrev).style.display = "none";										
+								}
+							}
+/* check: are the fields right of the second box until the first box empty	*/						
+							if (boxPosX == boxPosXPrev && boxPosY < boxPosYPrev){
+								var filledBoxes = 0;
+								for (i=boxPosY;i<boxPosYPrev;i++){
+/* check: are the fields left of the second box until the first box empty */
+									if (document.getElementById(boxPosX + "-" + i).style.display != "none"){
+										filledBoxes++;
+									}
+								}
+							
+								if (filledBoxes == 1) {
+									document.getElementById(boxPosX + "-" + boxPosY).style.display = "none";
+									document.getElementById(boxPosXPrev + "-" + boxPosYPrev).style.display = "none";										
+								}
+							}
+						
+/* check: are the fields on buttom of the second box until the first box empty */
+							if (boxPosY == boxPosYPrev && boxPosX > boxPosXPrev){
+								var filledBoxes = 0;
+								for (i=boxPosXPrev;i<boxPosX;i++){
+									
+									if (document.getElementById(i + "-" + boxPosY).style.display != "none"){
+										filledBoxes++;
+									}
+								}
+							
+								if (filledBoxes == 1) {
+										document.getElementById(boxPosX + "-" + boxPosY).style.display = "none";
+										document.getElementById(boxPosXPrev + "-" + boxPosYPrev).style.display = "none";										
+								}
+							}
+/* check: are the fields on top of the second box until the first box empty */
+							if (boxPosY == boxPosYPrev && boxPosX < boxPosXPrev){
+									var filledBoxes = 0;
+									for (i=boxPosX;i<boxPosXPrev;i++){
+										
+										if (document.getElementById(i + "-" + boxPosY).style.display != "none"){
+											filledBoxes++;
+										}
+									}
+									if (filledBoxes == 1) {
+											document.getElementById(boxPosX + "-" + boxPosY).style.display = "none";
+											document.getElementById(boxPosXPrev + "-" + boxPosYPrev).style.display = "none";										
+									}
+								}
+
+/* Check if box is in the current and lower line and no field in between is filled	*/									
+							if (boxPosX == boxPosXPrev - 1){
+								var filledBoxes = 0;
+								for (i=boxPosYPrev;i>=0;i--){
+									if (document.getElementById(boxPosXPrev + "-" + i).style.display != "none"){
+										filledBoxes++;
+									}
+								}
+								if (filledBoxes == 1){
+									filledBoxes = 0;
+									for (i=8;i>=boxPosY;i--){
+										if (document.getElementById(boxPosXPrev-1 + "-" + i).style.display != "none"){
+										filledBoxes++;
+										}
+									}
+									if (filledBoxes == 1){		
+										document.getElementById(boxPosX + "-" + boxPosY).style.display = "none";
+										document.getElementById(boxPosXPrev + "-" + boxPosYPrev).style.display = "none";										
+										filledBoxes = 0;
+									}	
+								}	
+							}
+							
+/* Check if box is in the current and upper line and no field in between is filled	*/									
+							if (boxPosX == boxPosXPrev + 1){
+								var filledBoxes = 0;
+								for (i=boxPosYPrev;i<=8;i++){
+									if (document.getElementById(boxPosXPrev + "-" + i).style.display != "none"){
+										filledBoxes++;
+									}
+								}
+								if (filledBoxes == 1){
+									filledBoxes = 0;
+									for (i=0;i<=boxPosY;i++){
+										if (document.getElementById(boxPosXPrev+1 + "-" + i).style.display != "none"){
+										filledBoxes++;
+										}
+									}
+									if (filledBoxes == 1){		
+										document.getElementById(boxPosX + "-" + boxPosY).style.display = "none";
+										document.getElementById(boxPosXPrev + "-" + boxPosYPrev).style.display = "none";										
+										filledBoxes = 0;
+									}	
+								}	
+							}
+
+						}
+						
+						setDesign("toUnselect", boxPosX, boxPosY);
+						setDesign("toUnselect", boxPosXPrev, boxPosYPrev);
+						marked = 0;
+					}
+
+/* Check for empty line and delete if there is one. */
+					gridBoard = document.getElementById("gridBoard");
+					for (var i=gridBoard.rows.length; i >= 0; i--) {
+					  	var notFilledBoxes = 0;
+					  	for (var j=0; j < 9; j++) {
+							if (document.getElementById(i + "-" + j)) {
+						  		if (document.getElementById(i + "-" + j).style.display == "none"){
+						  			notFilledBoxes++;
+						  		}
+					  		}
+					  	}
+
+/* start delete of row sequence */
+					  	if (notFilledBoxes == 9){
+
+/* checking if rows are behind the deleted one and rename them */
+							for (var k=0; k < gridBoard.rows.length; k++) {
+							  															
+								for (var l=0; l < 9; l++) {
+									if (k>=i){
+										m=k-1;
+										if (document.getElementById(k + "-" + l)){
+											console.log("alt:"+k+"-"+l);
+											console.log("neu:"+m+"-"+l);
+											var prevBox = k+"-"+l;
+											var currentBox = m+"-"+l;
+											document.getElementById(prevBox).setAttribute("id", currentBox);
+											
+/* Recolor changed rows background  */
+											if ((m+l)%2 == 0){
+												    var bgCol = "#5B827C";
+												}
+												else {
+													var bgCol = "#A3C2A2";
+												}
+											
+											currentTd = (9*(m+1)+l);
+											console.log("td= " + currentTd);
+											var currentCell = document.getElementsByTagName("td")[currentTd];
+											currentCell.style.backgroundColor = bgCol;
+
+/*change the call funtion to mark the correct box red */
+											document.getElementById(m + "-" + l).setAttribute("onClick", "javascript: markRed("+m+","+l+");");
+										}
+									}							
+								}
+							}
+
+					  		gridBoard.deleteRow(i);
+					
+/* showing highscore save option when all rows are deleted */
+
+							if (gridBoard.rows.length < 1) {
+								document.getElementById("gameContentHighscore").style.display = "block";
+								var oldHighscore = getHighscore(currentLevel);
+								document.getElementById("gameContentHighscore").innerHTML = "<p>Old best score: " + oldHighscore + "</p>";
+								if (moves < oldHighscore || oldHighscore == null) {
+									setHighscore(currentLevel, moves);
+									document.getElementById("gameContentHighscore").innerHTML += "<p>You have a new best score: " + moves + "</p>";
+								}
+								else {
+									document.getElementById("gameContentHighscore").innerHTML += "<p>New best score: " + oldHighscore + "</p>";
+								}
+
+								document.getElementById("gameContentHighscore").innerHTML += '<input type="button" name="startPage" value="Back to start">';
+								document.getElementById("gameContentHighscore").setAttribute("onClick", "goFromTo('gamePage','startPage')");
+							}							
+					  	}
+					}
+				}
+				else {
+
+/* box color when selected */
+					setDesign("toSelect", boxPosX, boxPosY);
+
+					boxPosXPrev = boxPosX;
+					boxPosYPrev = boxPosY;
+					boxValuePrev = boxValue;
+					marked = 1;
+				}	
+			}		
+			
+		</script>
+		
+		<style>
+			a {
+				display:block;
+             	width:100%; 
+             	height:50px;
+             	vertical-align:middle;
+             	}
+            p {
+            	font-family: Helvetica;
+            	margin:0;
+            	padding:0;
+            }
+            body, html{
+            	margin: 0px;
+            	
+				height: 100%;
+
+				background-image: -ms-radial-gradient(left top, circle farthest-side, #5B827C 0%, #264A4F 100%);
+				background-image: -moz-radial-gradient(left top, circle farthest-side, #5B827C 0%, #264A4F 100%);
+				background-image: -o-radial-gradient(left top, circle farthest-side, #5B827C 0%, #264A4F 100%);
+				background-image: -webkit-gradient(radial, left top, 0, left top, 904, color-stop(0, #5B827C), color-stop(1, #264A4F));
+				background-image: -webkit-radial-gradient(left top, circle farthest-side, #5B827C 0%, #264A4F 100%);
+				background-image: radial-gradient(circle farthest-side at left top, #5B827C 0%, #264A4F 100%);
+
+				background-attachment: fixed;
+
+            }
+            div.button {
+             	width: 100%;
+             	height: 50px;
+             	background-color: #333;
+             	border-radius: 10px;
+             	color: #BBB;
+             }
+             
+			#startPage, #gamePage, #introPage{
+				height: 100%;
+				width: 100%;
+				padding: 0px;
+				margin: 0px;
+			}
+			
+			#introPage {
+				padding: 0px;
+				width: 100%;
+				height: 100%;
+			}
+			
+			#introTitle {
+				padding-top: 10%;
+				text-align: center;
+			}
+			
+			#introLogo {
+				margin: 0 0;
+				padding-top: 10px;
+				padding-bottom: 10%;
+				text-align: center;
+			}
+			
+			#introLogo input {
+				width: 50px;
+				height: 50px;
+				display: inline;
+				font-size: 32px;
+				text-align: center;
+				
+			}
+			
+			.LogoItemMarked {
+				background-color: #D17659;
+			}
+			
+			#introFooter, #startFooter, #gameFooter {
+				width: 100%;
+				background-color: #F7F6C9;
+				box-shadow: -2px -2px 10px 5px #333;
+				position: fixed;
+   				bottom:0;
+			}
+			
+			#gameFooter {
+				height: 58px;
+			}
+			
+			#introFooter input, #startFooter input, #gameFooter input{
+				display: inline;
+				width: 30%;
+				background-color: #A3C2A2;
+				text-align: center;
+				
+			}
+			
+			#gameFooter h2 {
+				display: inline;
+				margin: 10px;
+				font-family: Helvetica;
+				font-size: 32px; 
+			}
+			
+			#gameFooterButtonLeft {
+				text-align: left;
+				font-size: 32px;
+				margin: 10px;
+				display: inline;
+				font-size: 32px;
+				font-family: Helvetica;
+				color: #264A4F;
+			}
+			
+			#introFooterButtonRight, #startFooterButtonRight, #gameFooterButtonRight {
+				position: fixed;
+				bottom: 0;
+				right: 0;	
+				display: block;				
+			}
+			
+			#gameHeaderButtonLeft, #gameHeaderButtonRight {
+				display: inline;
+				width: 30%;
+				background-color: #264A4F;
+				text-align: center;
+				color: #F7F6C9;
+				height: 30px;
+				padding: 5px 10px;
+			}
+
+			#gameHeaderButtonRight {
+				position: fixed;
+				top: 0;
+				right: 0;	
+				display: block;
+			}
+
+			
+			#startHeader, #gameHeader {
+				background-color: #A3C2A2;
+				box-shadow: 2px 2px 10px 5px #222;
+				width: 100%;
+				position: fixed;
+   				top:0;
+			}
+			
+			#startLogo {
+				padding: 5px;
+			}
+			
+			#startLogo input {
+				width: 15px;
+				height: 10px;
+				display: inline;
+				font-size: 10px;
+				text-align: center;
+				padding: 5px 3px;
+				margin: 2px;
+				box-shadow: 1px 1px 1px 1px #333;
+			}
+			
+			#startHeaderTitle {
+				display: inline;
+				position: fixed;
+				top: 0;
+				right: 0;
+			}
+
+			#startHeaderTitle h1 {
+				font-size: 24px;
+				margin-right: 15px;
+			}
+			
+			#startHeaderTitle p {
+				font-size: 12px;
+			}
+			
+			#startContent {
+				padding: 30px 0px;
+				text-align: center;
+				margin: 40px 0px;
+			}
+			.startLvlIcon {
+				display: inline;
+				
+             	margin: 10px;
+				padding: 10px 20px;
+				
+				font-size: 16px;
+				color: #264A4F;
+				
+				border-radius: 2px;
+				
+				box-shadow: inset 2px 2px 2px 2px #333;
+				border: 5px;
+				border-color: #333;
+				
+				background-color:#F7F6C9;
+
+			}
+			
+			#gameHeader {
+				height: 50px;
+			}
+			
+			#gameContent {
+				padding: 70px 5px;
+			}
+			
+			#gameContentHighscore {
+				text-align: center;
+			}
+			
+			input {
+				border: 5px;
+				border-color: #333;
+				
+				background-color:#F7F6C9;
+				
+				display: inline;
+				
+				margin: 10px;
+				padding: 10px;
+				
+				font-size: 16px;
+				color: #264A4F;
+				
+				border-radius: 2px;
+				
+				box-shadow: 2px 2px 2px 2px #333;
+			}
+			h1 {
+				color: #F7F6C9;
+				font-family: 'Lobster', cursive;
+				
+				margin: 0px;
+				-webkit-margin-before: 0px;
+				-webkit-margin-after: 0px;
+				-webkit-margin-start: 0px;
+				-webkit-margin-end: 0px;
+				
+				text-shadow: 1px 1px 1px #333;				
+			}
+			
+			h2 {
+				color: #264A4F;
+				font-family: Helvetica;
+			}
+			p {
+				color: #F7F6C9;
+				font-family: Helvetica;	
+			}
+			
+			.gameStone {
+				border-radius: 2px;
+				
+				background-color: #F7F6C9;
+				height:32px; 
+				text-align: center; 
+				text-indent:0; 
+				color: #264A4F; 
+				font-family: Arial; 
+				font-size: 15px; 
+				font-weight: bold; 
+				font-style: normal; 
+				text-decoration: none; 
+				text-shadow: 1px 1px 0px #aade7c; 
+				display:block; 
+				vertical-align:middle; 
+				padding-top: 10px;
+				box-shadow: 1px 1px 0px #333;
+				margin: 2px;
+			}
+			
+			#gamePage, #startPage {
+				display: none;
+			}
+			
+		</style>
+				
+	</head>
+
+	<body onload="mainScreen()">
+		<div id="introPage">
+			<div id="introTitle">
+				<h1 style="font-size: 38px">two for ten</h1>
+			</div>
+			<div id="introLogo">
+				<input class="LogoItemMarked" name="k1" value="2" />
+				<input name="k2" value="4" />
+				<br/>
+				<input name="k3" value="1" />
+				<input name="k4" value="0" />
+			</div>
+			<div id="introFooter">
+				<input id="introFooterButtonLeft" onclick="goFromTo('introPage', 'startPage')" type="button" name="quickStart" value="Quick Start" />
+				<input id="introFooterButtonRight" name="Login" value="Login" />
+			</div>
+		</div>
+		
+		<div id="startPage">
+			<header id="startHeader">
+				<div id="startLogo">
+					<input class="LogoItemMarked" name="k1" value="2" />
+					<input name="k2" value="4" />
+					<br/>
+					<input name="k3" value="1" />
+					<input name="k4" value="0" />
+				</div>
+				<div id="startHeaderTitle">
+					<h1>2 for 10</h1>
+					<p>Version 0.0.5</p>
+				</div>
+			</header>
+
+			<div id="startContent">				
+			</div>
+		
+			<footer id="startFooter">
+				<input id="startFooterButtonLeft" type="button" name="login" value="Login" onclick="loginScreen()">
+				<input id="startFooterButtonRight" type="button" name="resetStore" value="Reset Scores" onclick="resetStore()">
+			</footer>
+		</div>
+		<div id="gamePage">
+			<header id="gameHeader">
+				<input id="gameHeaderButtonLeft" type="button" name="Back" value="back" onclick="goFromTo('gamePage','startPage')">
+				<input id="gameHeaderButtonRight" type="button" name="Next" value="next" onclick="doubleFill()">
+			</header>
+			
+			<div id="gameContent">
+			</div>
+
+			<div id="gameContentHighscore">
+			</div>
+			
+			<footer id="gameFooter">
+				<div style="margin: 10px">
+					<h2>Score: </h2>
+					<div id="gameFooterButtonLeft"> </div> 
+					<input id="gameFooterButtonRight" type="button" name="Next" value="next" onclick="doubleFill()">
+				</div>
+			</footer>
+			
+		</div>
+		
+	</body>
+</html>
